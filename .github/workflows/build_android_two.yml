@@ -7,11 +7,9 @@ on:
         description: 'select branch to build(default: android)'
         required: false
         default: 'android'
-  # schedule:
-  #   - cron: "0 0 */7 * *"
 
 jobs:
-  cemu_android_build:
+  cemj_android_build:
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -21,10 +19,12 @@ jobs:
         distribution: temurin
         java-version: 17
 
-    - name: Download Cemu Android source code
+    - name: Download Cemu source code
       run: |
         cd ${{ github.workspace }}
         git clone --branch ${{ github.event.inputs.branch || 'android' }} https://github.com/XDeathUserX/Cemu-Android.git --recursive
+        cd Cemu-Android
+        
 
     - id: version
       name: Get version
@@ -39,37 +39,33 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          ~/.gradle/caches
           ~/.gradle/wrapper
-          ~/.cache
-        key: ${{ runner.os }}-Cemu-${{ steps.version.outputs.hash }}
+        key: ${{ runner.os }}-cemu-android-${{ steps.version.outputs.hash }}
         restore-keys: |
-            ${{ runner.os }}-Cemu-
+            ${{ runner.os }}-cemu-android-
 
    # - name: Prepare environment
    #   run: |
-   #     sudo apt-get install ccache glslang-dev glslang-tools
-
+   #     sudo apt-get install -y ninja-build
+   #       ln -s /usr/bin/ninja .
     - name: Build Android
       run: |
-   #     export NDK_CCACHE="$(which ccache)"
-   #     ccache -sv
-        cd ${{ github.workspace }}/Cemu-Android/src/android/app/
+        cd ${{ github.workspace }}/Cemu-Android
         chmod +x ./gradlew
         ./gradlew "assembleRelease"
-        mv app/build/outputs/apk/release/.apk ${{ github.workspace }}/Cemu${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
-     #   ccache -sv
+        # bash gradlew build
+        mv $(find app/build/outputs/apk -type f | grep -E "\.apk$") ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
 
-    - name: Release Cemu Android (Cemu-Android)
+    - name: Release Cemu (Cemu-Android)
       uses: softprops/action-gh-release@v2
       with:
-        name: Cemu Android ${{ steps.version.outputs.date }}
+        name: Cemu ${{ steps.version.outputs.date }}
         tag_name: Cemu
-        files: ${{ github.workspace }}/Cemu${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        files: ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
 
-    - name: Release Cemu Android ${{ steps.version.outputs.date }}
+    - name: Release PCSX2 ${{ steps.version.outputs.date }}
       uses: softprops/action-gh-release@v2
       with:
         name: ${{ steps.version.outputs.date }}
         tag_name: ${{ steps.version.outputs.date }}
-        files: ${{ github.workspace }}/Cemu${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        files: ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
