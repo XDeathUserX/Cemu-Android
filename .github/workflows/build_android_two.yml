@@ -52,8 +52,8 @@ jobs:
 
     - name: Build Android
       run: |
-        export NDK_CCACHE="$(which ccache)"
-        ccache -sv
+   #     export NDK_CCACHE="$(which ccache)"
+   #     ccache -sv
         cd ${{ github.workspace }}/Cemu-Android/src/android/app/
         chmod +x ./gradlew
         ./gradlew "assembleRelease"
