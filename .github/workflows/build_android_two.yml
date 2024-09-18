@@ -9,7 +9,7 @@ on:
         default: 'android'
 
 jobs:
-  cemj_android_build:
+  cemu_android_build:
     permissions:
       contents: write
     runs-on: ubuntu-latest
