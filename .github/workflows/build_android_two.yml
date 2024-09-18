@@ -1,0 +1,75 @@
+name: cemu-android-build-alternative
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'select branch to build(default: android)'
+        required: false
+        default: 'android'
+  # schedule:
+  #   - cron: "0 0 */7 * *"
+
+jobs:
+  cemu_android_build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 21
+
+    - name: Download Cemu Android source code
+      run: |
+        cd ${{ github.workspace }}
+        git clone --branch ${{ github.event.inputs.branch || 'android' }} https://github.com/XDeathUserX/Cemu-Android.git --recursive
+
+    - id: version
+      name: Get version
+      run: |
+        echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
+        cd ${{ github.workspace }}/Cemu-Android
+        echo "hash=$(git log -1 --pretty=format:%H)" >> $GITHUB_OUTPUT
+        echo "short_hash=$(git describe --always --long)" >> $GITHUB_OUTPUT
+        echo "version=$(git describe --tags --always)" >> $GITHUB_OUTPUT
+
+    - name: Set up cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          ~/.cache
+        key: ${{ runner.os }}-cemu-android-${{ steps.version.outputs.hash }}
+        restore-keys: |
+            ${{ runner.os }}-cemu-android-
+
+    - name: Prepare environment
+      run: |
+        sudo apt-get install ccache glslang-dev glslang-tools
+
+    - name: Build Android
+      run: |
+        export NDK_CCACHE="$(which ccache)"
+        ccache -sv
+        cd ${{ github.workspace }}/Uzuy-Test/src/android
+        chmod +x ./gradlew
+        ./gradlew "assembleRelease"
+        mv ./src/android/app/build/outputs/apk/release/app-release.apk ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        ccache -sv
+
+    - name: Release Cemu Android (Cemu-Android)
+      uses: softprops/action-gh-release@v2
+      with:
+        name: Uzuy Android ${{ steps.version.outputs.date }}
+        tag_name: cemu-android
+        files: ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+
+    - name: Release Cemu Android ${{ steps.version.outputs.date }}
+      uses: softprops/action-gh-release@v2
+      with:
+        name: ${{ steps.version.outputs.date }}
+        tag_name: ${{ steps.version.outputs.date }}
+        files: ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
