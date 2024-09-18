@@ -63,7 +63,7 @@ jobs:
         tag_name: Cemu
         files: ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
 
-    - name: Release PCSX2 ${{ steps.version.outputs.date }}
+    - name: Release Cemu ${{ steps.version.outputs.date }}
       uses: softprops/action-gh-release@v2
       with:
         name: ${{ steps.version.outputs.date }}
