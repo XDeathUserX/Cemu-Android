@@ -58,7 +58,7 @@ jobs:
         chmod +x ./gradlew
         ./gradlew "assembleRelease"
         mv app/build/outputs/apk/release/.apk ${{ github.workspace }}/Cemu${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
-        ccache -sv
+     #   ccache -sv
 
     - name: Release Cemu Android (Cemu-Android)
       uses: softprops/action-gh-release@v2
