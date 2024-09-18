@@ -54,7 +54,7 @@ jobs:
         chmod +x ./gradlew
         ./gradlew "assembleRelease"
         # bash gradlew build
-        mv $(find app/build/outputs/apk/release/.apk -type f | grep -E "\.apk$") ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        mv $(find app/build/outputs/apk/release/ -type f | grep -E "\.apk$") ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
 
     - name: Release Cemu (Cemu-Android)
       uses: softprops/action-gh-release@v2
