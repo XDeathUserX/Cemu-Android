@@ -1,0 +1,59 @@
+
+name: Mirror Git
+
+on:
+  workflow_dispatch:
+   inputs:
+      android:
+        description: 'Whether to trigger an Android build (true/false/auto)'
+        required: false
+        default: 'true'
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    
+    permissions: write-all
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
+
+    - name: Clone GitLab repo
+      run: git clone --branch android https://github.com/YGOmod/Cemu.git mirror
+
+    - name: Copy GitHub Action file to cloned repo
+      run: |
+        mkdir -p mirror/.github/workflows/
+        cp .github/workflows/mirror.yml mirror/.github/workflows/
+        cp .github/workflows/build_check.yml mirror/.github/workflows/
+        cp .github/workflows/build.yml mirror/.github/workflows/
+        cp .github/workflows/deploy_experimental_release.yml mirror/.github/workflows/
+        cp .github/workflows/deploy_stable_release.yml mirror/.github/workflows/
+        cp .github/workflows/determine_release_version.yml mirror/.github/workflows/
+        cp .github/workflows/generate_pot.yml mirror/.github/workflows/
+        
+        
+    
+
+    - name: Commit and force push to GitHub
+      run: |
+        cd mirror
+        git remote set-url origin https://github.com/${{ github.repository }}.git
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add .
+        git commit -a -m "Add GitHub Action file"
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
+        branch: ${{ github.ref }}
+        github_url: https://github.com
+        directory: ./mirror
+        force: true
+        
