@@ -42,9 +42,9 @@ jobs:
           ~/.gradle/caches
           ~/.gradle/wrapper
           ~/.cache
-        key: ${{ runner.os }}-cemu-android-${{ steps.version.outputs.hash }}
+        key: ${{ runner.os }}-Cemu-${{ steps.version.outputs.hash }}
         restore-keys: |
-            ${{ runner.os }}-cemu-android-
+            ${{ runner.os }}-Cemu-
 
    # - name: Prepare environment
    #   run: |
@@ -57,19 +57,19 @@ jobs:
         cd ${{ github.workspace }}/Cemu-Android/src/android/app/
         chmod +x ./gradlew
         ./gradlew "assembleRelease"
-        mv ./src/android/app/build/outputs/apk/release/.apk ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        mv app/build/outputs/apk/release/.apk ${{ github.workspace }}/Cemu${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
         ccache -sv
 
     - name: Release Cemu Android (Cemu-Android)
       uses: softprops/action-gh-release@v2
       with:
-        name: Uzuy Android ${{ steps.version.outputs.date }}
-        tag_name: cemu-android
-        files: ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        name: Cemu Android ${{ steps.version.outputs.date }}
+        tag_name: Cemu
+        files: ${{ github.workspace }}/Cemu${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
 
     - name: Release Cemu Android ${{ steps.version.outputs.date }}
       uses: softprops/action-gh-release@v2
       with:
         name: ${{ steps.version.outputs.date }}
         tag_name: ${{ steps.version.outputs.date }}
-        files: ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        files: ${{ github.workspace }}/Cemu${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
