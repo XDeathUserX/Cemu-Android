@@ -19,7 +19,7 @@ jobs:
     - uses: actions/setup-java@v4
       with:
         distribution: temurin
-        java-version: 21
+        java-version: 17
 
     - name: Download Cemu Android source code
       run: |
@@ -46,18 +46,18 @@ jobs:
         restore-keys: |
             ${{ runner.os }}-cemu-android-
 
-    - name: Prepare environment
-      run: |
-        sudo apt-get install ccache glslang-dev glslang-tools
+   # - name: Prepare environment
+   #   run: |
+   #     sudo apt-get install ccache glslang-dev glslang-tools
 
     - name: Build Android
       run: |
         export NDK_CCACHE="$(which ccache)"
         ccache -sv
-        cd ${{ github.workspace }}/Uzuy-Test/src/android
+        cd ${{ github.workspace }}/Cemu-Android/src/android/app/
         chmod +x ./gradlew
         ./gradlew "assembleRelease"
-        mv ./src/android/app/build/outputs/apk/release/app-release.apk ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        mv ./src/android/app/build/outputs/apk/release/.apk ${{ github.workspace }}/cemu-android-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
         ccache -sv
 
     - name: Release Cemu Android (Cemu-Android)
