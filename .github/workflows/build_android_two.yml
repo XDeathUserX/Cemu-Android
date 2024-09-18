@@ -50,7 +50,7 @@ jobs:
    #       ln -s /usr/bin/ninja .
     - name: Build Android
       run: |
-        cd ${{ github.workspace }}/Cemu-Android/src/android/app/
+        cd ${{ github.workspace }}/Cemu-Android/src/android/
         chmod +x ./gradlew
         ./gradlew "assembleRelease"
         # bash gradlew build
