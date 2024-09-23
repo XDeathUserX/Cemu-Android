@@ -28,6 +28,8 @@ jobs:
       run: |
         mkdir -p mirror/.github/workflows/
         cp .github/workflows/mirror.yml mirror/.github/workflows/
+        cp .github/workflows/android_build mirror/.github/workflows/
+        cp .github/workflows/android_build_two.yml mirror/.github/workflows/
         cp .github/workflows/build_check.yml mirror/.github/workflows/
         cp .github/workflows/build.yml mirror/.github/workflows/
         cp .github/workflows/deploy_experimental_release.yml mirror/.github/workflows/
